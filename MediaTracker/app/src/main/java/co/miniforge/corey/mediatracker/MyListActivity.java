@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 import java.util.List;
 
+import co.miniforge.corey.mediatracker.controller.IntentClickListener;
 import co.miniforge.corey.mediatracker.media_recycler.MediaRecyclerAdapter;
 import co.miniforge.corey.mediatracker.media_store.MediaStorageUtil;
 import co.miniforge.corey.mediatracker.model.MediaItem;
@@ -80,6 +81,9 @@ public class MyListActivity extends AppCompatActivity {
     }
 
     void bindData(){
+        //Nevermind, this apparently isn't needed.
+        //IntentClickListener iListener = new IntentClickListener(this);
+
         add_media_item_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -107,6 +111,8 @@ public class MyListActivity extends AppCompatActivity {
             }
         };
         handler.post(runnable);
+
+
     }
 
     public void updateMediaItems(List<MediaItem> mediaItems){
