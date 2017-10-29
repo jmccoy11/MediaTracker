@@ -39,6 +39,9 @@ public class MediaDetailActivity extends AppCompatActivity {
         bindFunctionality();
     }
 
+    /**
+     * Locate the Views in the activity and assign them to class variables.
+     */
     private void locateViews() {
         this.title = (EditText) findViewById(R.id.et_title);
         this.description = (EditText) findViewById(R.id.et_description);
@@ -48,8 +51,14 @@ public class MediaDetailActivity extends AppCompatActivity {
         this.cancel = (Button) findViewById(R.id.btn_cancel);
     }
 
+    /**
+     * Bind functionality to for this Activity
+     */
     private void bindFunctionality() {
+        // Check if the Intent has the extra mediaExtra.
         if(getIntent().hasExtra(MyListActivity.mediaExtra)) {
+            // If it does, grab the JSON from the Intent and create a new JSONObject from
+            // the stringExtra.
             String mediaItemJSONString = getIntent().getStringExtra(MyListActivity.mediaExtra);
 
             JSONObject json = null;
@@ -61,8 +70,10 @@ public class MediaDetailActivity extends AppCompatActivity {
             }
 
             if(json!=null){
+                // Use the JSONObject to instantiate the mediaItem in this class
                 mediaItem = new MediaItem(json);
 
+                // Set the text of the EditTexts to the data in the mediaItem
                 title.setText(mediaItem.title);
                 description.setText(mediaItem.description);
                 url.setText(mediaItem.url);
@@ -71,14 +82,19 @@ public class MediaDetailActivity extends AppCompatActivity {
             }
         }
 
+        // Set the OnClickListener for the Save button
         save.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
+
+                // grab the text from the EditTexts and set them to the variables in the
+                // mediaItem
                 mediaItem.title = title.getText().toString();
                 mediaItem.description = description.getText().toString();
                 mediaItem.url = url.getText().toString();
 
+                // Create an intent and pass this class's mediaItem as a JSON String
                 Intent intent = new Intent(getApplicationContext(), MyListActivity.class);
                 intent.putExtra(MyListActivity.mediaExtra, mediaItem.toJson().toString());
                 startActivity(intent);
@@ -86,10 +102,12 @@ public class MediaDetailActivity extends AppCompatActivity {
             }
         });
 
+        // Set the OnClickListener for the Cancel Button
         cancel.setOnClickListener(new View.OnClickListener(){
 
             @Override
             public void onClick(View view) {
+                // Create an intent to go back to MyListActivity
                 Intent intent = new Intent(getApplicationContext(), MyListActivity.class);
                 startActivity(intent);
                 finish();

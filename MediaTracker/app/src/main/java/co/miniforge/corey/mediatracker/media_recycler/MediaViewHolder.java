@@ -37,6 +37,12 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
         mediaDescription = itemView.findViewById(R.id.mediaDescription);
     }
 
+    /**
+     * Set the OnClickListener for this View to create an intent to go to MediaDetailActivity.
+     * Put Extra into the intent with the media.toJson.toString.
+     *
+     * @param mediaItem - MediaItem - The Item that belongs to the View that was clicked.
+     */
     public void bindData(final MediaItem mediaItem){
         this.mediaName.setText(mediaItem.title);
         this.mediaDescription.setText(mediaItem.description);
