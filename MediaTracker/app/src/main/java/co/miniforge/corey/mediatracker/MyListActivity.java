@@ -120,7 +120,29 @@ public class MyListActivity extends AppCompatActivity {
         ((MediaRecyclerAdapter)media_list_recycler.getAdapter()).updateList(this.mediaItems);
     }
 
-    void setUpRecyclerView(){
+    /**
+     * Loop through the items in the media item list, remove the media item that has a matching
+     * id, and then reload the list using the storage utility
+     *
+     * @param item - The MediaItem to delete
+     */
+    public void deleteMediaItem(MediaItem item){
+        //Loop through the mediaItems that update a media item from the detail activity
+        for(int i = 0; i < mediaItems.size(); i++){
+            //remove any items that were deleted
+            if(mediaItems.get(i).id.equals(item.id)){
+                mediaItems.remove(i);
+                break;
+            }
+        }
+        //save MediaDetail
+        storageUtil.saveMediaData(mediaItems);
+
+        //update MediaItems in storage.Util
+        updateMediaItems(storageUtil.getMediaDataList());
+    }
+
+    void setUpRecyclerView() {
         MediaRecyclerAdapter adapter = new MediaRecyclerAdapter();
         media_list_recycler.setAdapter(adapter);
 

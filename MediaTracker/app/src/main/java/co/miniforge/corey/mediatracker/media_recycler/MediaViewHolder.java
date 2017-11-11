@@ -24,7 +24,7 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
     Context context;
 
     public MediaViewHolder(View itemView) {
-            super(itemView);
+        super(itemView);
 
         locateViews(itemView);
     }
@@ -54,6 +54,17 @@ public class MediaViewHolder extends RecyclerView.ViewHolder {
                 Intent intent = new Intent(context, MediaDetailActivity.class);
                 intent.putExtra(MyListActivity.mediaExtra, mediaItem.toJson().toString());
                 context.startActivity(intent);
+            }
+        });
+
+        /*
+            This is the OnLongClick that will delete a media item.
+         */
+        inflated.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                ((MyListActivity)context).deleteMediaItem(mediaItem);
+                return true;
             }
         });
     }

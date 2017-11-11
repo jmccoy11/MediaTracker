@@ -12,10 +12,7 @@ import co.miniforge.corey.mediatracker.media_store.Md5IdHelper;
  * Created by corey on 10/20/17.
  */
 
-public class MediaItem {
-    public static int defaultId = 0;
-
-    public String id;
+public class MediaItem {public String id;
     public String title;
     public String description;
     public String url;
@@ -33,10 +30,32 @@ public class MediaItem {
     }
 
     public MediaItem(){
-        this.id = Md5IdHelper.idForObject(defaultId++);
+        this.id = Md5IdHelper.idForObject(this);
         this.title = "defaultTitle";
         this.description = "defaultDescription";
         this.url = "defaultUrl";
+    }
+
+    MediaItemType getTypeForString(String value){
+        switch (value){
+            case "TV":
+                return  MediaItemType.TV;
+            case "Movie":
+                return  MediaItemType.Movie;
+            default:
+                return MediaItemType.Generic;
+        }
+    }
+
+    String getStringForType (MediaItemType type){
+        switch (type) {
+            case Movie:
+                return "Movie";
+            case TV:
+                return "TV";
+            default:
+                return "Generic";
+        }
     }
 
     public JSONObject toJson(){
