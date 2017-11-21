@@ -4,12 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,21 +20,22 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 import java.util.List;
 
-import co.miniforge.corey.mediatracker.controller.IntentClickListener;
 import co.miniforge.corey.mediatracker.media_recycler.MediaRecyclerAdapter;
 import co.miniforge.corey.mediatracker.media_store.MediaStorageUtil;
 import co.miniforge.corey.mediatracker.model.MediaItem;
+import co.miniforge.corey.mediatracker.ui_helpers.AddPopUpMenuHelper;
+import co.miniforge.corey.mediatracker.ui_helpers.ThemeHelper;
 
 public class MyListActivity extends AppCompatActivity {
     public static String mediaExtra = "mediaExtra";
+    public static String mediaType = "mediaType";
 
     RecyclerView media_list_recycler;
-
     FloatingActionButton add_media_item_button;
-
     MediaStorageUtil storageUtil;
-
     List<MediaItem> mediaItems = new LinkedList<>();
+    ThemeHelper themeHelper;
+    View rootView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +45,8 @@ public class MyListActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         storageUtil = new MediaStorageUtil(getApplicationContext());
+
+        themeHelper = new ThemeHelper(getApplicationContext());
 
         locateViews();
 
@@ -78,20 +82,30 @@ public class MyListActivity extends AppCompatActivity {
     void locateViews(){
         media_list_recycler = (RecyclerView) findViewById(R.id.media_list_recycler);
         add_media_item_button = (FloatingActionButton) findViewById(R.id.add_media_item_button);
+        rootView = (View) findViewById(R.id.mylistactivity);
     }
 
     void bindData(){
         //Nevermind, this apparently isn't needed.
         //IntentClickListener iListener = new IntentClickListener(this);
 
+        themeHelper.themeBackground(rootView);
+
         add_media_item_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Create new empty media item
-                MediaItem item = new MediaItem();
-                mediaItems.add(item);
-                storageUtil.saveMediaData(mediaItems);
-                updateMediaItems(mediaItems);
+//                //Create new empty media item
+//                MediaItem item = new MediaItem();
+//                mediaItems.add(item);
+//                storageUtil.saveMediaData(mediaItems);
+//                updateMediaItems(mediaItems);
+
+                PopupMenu menu = new PopupMenu(view.getContext(), view);
+                menu.inflate(R.menu.add_menu);
+                menu.setOnMenuItemClickListener(
+                        new AddPopUpMenuHelper(
+                                (MyListActivity)view.getContext()));
+                menu.show();
             }
         });
 
@@ -111,8 +125,6 @@ public class MyListActivity extends AppCompatActivity {
             }
         };
         handler.post(runnable);
-
-
     }
 
     public void updateMediaItems(List<MediaItem> mediaItems){
@@ -148,5 +160,26 @@ public class MyListActivity extends AppCompatActivity {
 
         LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
         media_list_recycler.setLayoutManager(manager);
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_my_list, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
+        }
+        return true;
+    }
+
+    public void addMediaItem(MediaItem item) {
+        this.mediaItems.add(item);
+        storageUtil.saveMediaData(mediaItems);
+        updateMediaItems(mediaItems);
     }
 }

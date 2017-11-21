@@ -16,6 +16,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import co.miniforge.corey.mediatracker.model.MediaItem;
+import co.miniforge.corey.mediatracker.model.MediaItemType;
+import co.miniforge.corey.mediatracker.model.MovieModel;
+import co.miniforge.corey.mediatracker.model.TVModel;
 
 /**
  * Created by corey on 10/15/17.
@@ -73,8 +76,22 @@ public class MediaStorageUtil {
                 JSONArray jsonArray = result.getJSONArray("array");
 
                 for(int i = 0; i < jsonArray.length(); i++){
-                    mediaList.add(new MediaItem(jsonArray.getJSONObject(i)));
-                }
+                    try {
+                        if(jsonArray.getJSONObject(i).get("type").equals("TV")) {
+                            mediaList.add(new TVModel(jsonArray.getJSONObject(i)));
+                        }
+                        else if (jsonArray.getJSONObject(i).get("type").equals("Movie")) {
+                            mediaList.add(new MovieModel(jsonArray.getJSONObject(i)));
+                        }
+                        else {
+                            mediaList.add(new MediaItem(jsonArray.getJSONObject(i)));
+                        }
+                    }
+                    catch (Exception exc) {
+                        Log.d("Debug", exc.getMessage());
+                    }
+
+                    }
             }
         } catch (Exception e) {
             Log.e("readDataError", String.format("There was an error: %s", e.getMessage()));

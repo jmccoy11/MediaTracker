@@ -1,17 +1,24 @@
 package co.miniforge.corey.mediatracker;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import co.miniforge.corey.mediatracker.model.MediaItem;
+import co.miniforge.corey.mediatracker.model.MediaItemType;
+import co.miniforge.corey.mediatracker.ui_helpers.ThemeHelper;
+
+import static co.miniforge.corey.mediatracker.MyListActivity.*;
 
 /**
  * This activity will display the contents of a media item and allow the user to update the contents
@@ -24,19 +31,30 @@ public class MediaDetailActivity extends AppCompatActivity {
     EditText description;
     EditText url;
 
+    View mediaDetailRoot;
+    ThemeHelper themeHelper;
+
     Button save;
-    Button cancel;
+    //Button cancel;
 
     MediaItem mediaItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_media_detail);
 
         locateViews();
 
         bindFunctionality();
+
+        if(mediaItem.type.equals(MediaItemType.TV)) {
+            setContentView(R.layout.activity_media_detail_tv);
+        }
+        else if(mediaItem.type.equals(MediaItemType.Movie)) {
+            setContentView(R.layout.activity_media_detail_movie);
+        }
     }
 
     /**
@@ -48,18 +66,24 @@ public class MediaDetailActivity extends AppCompatActivity {
         this.url = (EditText) findViewById(R.id.et_url);
 
         this.save = (Button) findViewById(R.id.btn_save);
-        this.cancel = (Button) findViewById(R.id.btn_cancel);
+        //this.cancel = (Button) findViewById(R.id.btn_cancel);
+
+        this.mediaDetailRoot = (View) findViewById(R.id.mediaDetailRoot);
     }
 
     /**
      * Bind functionality to for this Activity
      */
     private void bindFunctionality() {
+        themeHelper = new ThemeHelper(mediaDetailRoot.getContext());
+        themeHelper.themeBackground(mediaDetailRoot);
+        themeHelper.themeTextView((TextView) title, (TextView) description, (TextView) url);
+
         // Check if the Intent has the extra mediaExtra.
-        if(getIntent().hasExtra(MyListActivity.mediaExtra)) {
+        if(getIntent().hasExtra(mediaExtra)) {
             // If it does, grab the JSON from the Intent and create a new JSONObject from
             // the stringExtra.
-            String mediaItemJSONString = getIntent().getStringExtra(MyListActivity.mediaExtra);
+            String mediaItemJSONString = getIntent().getStringExtra(mediaExtra);
 
             JSONObject json = null;
             try {
@@ -87,6 +111,30 @@ public class MediaDetailActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
+            promptConfirmation();
+            }
+        });
+
+        // Set the OnClickListener for the Cancel Button
+//        cancel.setOnClickListener(new View.OnClickListener(){
+//
+//            @Override
+//            public void onClick(View view) {
+//
+//            }
+//        });
+    }
+
+    void promptConfirmation() {
+        //https://developer.android.com/guide/topics/ui/dialogs.html#AlertDialog
+//Make sure to put the code in the activity, the builder requires an activity to be passed in
+//import android.support.v7.app for the alert dialog
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Save Changes").setMessage("Are you sure you want to save these changes?");
+
+        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
 
                 // grab the text from the EditTexts and set them to the variables in the
                 // mediaItem
@@ -96,22 +144,21 @@ public class MediaDetailActivity extends AppCompatActivity {
 
                 // Create an intent and pass this class's mediaItem as a JSON String
                 Intent intent = new Intent(getApplicationContext(), MyListActivity.class);
-                intent.putExtra(MyListActivity.mediaExtra, mediaItem.toJson().toString());
+                intent.putExtra(mediaExtra, mediaItem.toJson().toString());
                 startActivity(intent);
                 finish();
             }
         });
-
-        // Set the OnClickListener for the Cancel Button
-        cancel.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View view) {
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
                 // Create an intent to go back to MyListActivity
                 Intent intent = new Intent(getApplicationContext(), MyListActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
